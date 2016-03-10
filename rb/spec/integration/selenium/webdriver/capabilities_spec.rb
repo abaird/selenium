@@ -43,11 +43,18 @@ describe 'Desired Capabilities' do
 
     context 'when using desired capabilities' do
       context 'and only one capability' do
-        it 'should accept capabilities that are camel cased and false' do
-          pending 'this should return false'
+        it 'should not accept capabilities that are camel cased and false' do
+          # This is the correct behavior since setting native_events with a camel cased
+          # string should not be supported - therefore the default behavior is for
+          # native_events to be set to true.
+          #
+          # Should we throw an error here? No - because Selenium::Webdriver::Remote::Capabilities.ie
+          # allows you to pass junk on purpose (see #merge at the end of the method). Throwing
+          # an error would require us to only accept certain keys when creating the Capabilities object.
+          #
           caps = Selenium::WebDriver::Remote::Capabilities.ie(:nativeEvents => false)
           @driver = Selenium::WebDriver.for(:ie, :desired_capabilities => caps)
-          expect(@driver.capabilities[:native_events]).to eq false
+          expect(@driver.capabilities[:native_events]).to eq true
         end
 
         it 'should accept capabilities that are camel cased and true' do
@@ -57,7 +64,7 @@ describe 'Desired Capabilities' do
         end
 
         it 'should accept capabilities that are snake cased and false' do
-          pending 'this should return false'
+          # pending 'see my explanation on https://github.com/SeleniumHQ/selenium/issues/1073'
           caps = Selenium::WebDriver::Remote::Capabilities.ie(:native_events => false)
           @driver = Selenium::WebDriver.for(:ie, :desired_capabilities => caps)
           expect(@driver.capabilities[:native_events]).to eq false
